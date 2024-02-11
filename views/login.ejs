@@ -1,0 +1,71 @@
+<%- include('partials/header') %>
+
+<div class="container mt-5">
+  <h1>Login</h1>
+  <div class="row">
+    <div class="col-sm-8">
+      <div class="card">
+        <div class="card-body">
+          <!-- Makes POST request to /login route -->
+          <form action="/login" method="POST">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" class="form-control" name="username" />
+            </div>
+            <%if(user === "wrong"){%>
+            <p class="wrong">The password or email is incorrect.</p>
+            <% }%> <%if(user === "email"){%>
+            <p class="wrong">No user found with matching email</p>
+            <% }%> <%if(user === "forget sucess"){%>
+            <p class="wrong">Password reset successful</p>
+            <% }%> <%if(user === "set sucess"){%>
+            <p class="wrong">Set password successful</p>
+            <% }%><%if(user === "change pass"){%>
+            <p class="wrong">Change password successful</p>
+            <% }%><%if(user === "already registered"){%>
+            <p class="wrong">Account already registered.</p>
+            <% }%>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" class="form-control" name="password" />
+            </div>
+            <button type="submit" class="btn btn-dark">Login</button>
+          </form>
+          <p class="dont-have sign-up">
+            <a href="/forget">Forger your password?</a>
+          </p>
+          <p class="dont-have sign-up">
+            Don't have an account? <a href="/register">Sign up</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-4">
+      <div class="card">
+        <div class="card-body">
+          <a
+            class="btn btn-block btn-social btn-google"
+            href="/auth/google"
+            role="button"
+          >
+            <i class="fab fa-google"></i>
+            Sign In with Google
+          </a>
+        </div>
+        <div class="card-body">
+          <a
+            class="btn btn-block btn-social btn-facebook"
+            href="/auth/facebook"
+            role="button"
+          >
+            <i class="fab fa-facebook"></i>
+            Sign Up with Facebook
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
