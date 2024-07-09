@@ -21,19 +21,7 @@ app.use(
     extended: true,
   })
 );
-// app.set("trust proxy", 1);
-// app.use(
-//   session({
-//     cookie: {
-//       maxAge: 1000 * 60 * 60 * 24 * 7,
-//     },
-//     secret: "Our little secret.",
-//     resave: true,
-//     saveUninitialized: true,
-//     proxy: true,
-//     cookie: { secure: true },
-//   })
-// );
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -126,7 +114,7 @@ passport.use(
       const info = profile._json;
       //console.log(profile._json);
       await User.findOrCreate(
-        { username: info.email, googleId: info.sub },
+        { email: info.email, googleId: info.sub },
         function (err, user) {
           if (err) {
             return cb(null, false);
@@ -206,7 +194,7 @@ app.get("/secrets", async function (req, res) {
 });  */
 //see account
 app.get("/account", async function (req, res) {
-  console.log("submit user " + req.user);
+  //console.log("submit user " + req.user.hash);
   //console.log(req);
   if (req.isAuthenticated()) {
     const userId = await User.findById(req.user.id);
@@ -329,10 +317,11 @@ app.post("/forget", async function (req, res) {
 });
 app.post("/setPassword", async function (req, res) {
   console.log(req.body);
-  User.findOne({ username: req.body.email }).then(
+  User.findOne({ email: req.body.email }).then(
     function (sanitizedUser) {
       if (sanitizedUser) {
         sanitizedUser.setPassword(req.body.password, function () {
+          sanitizedUser.username = req.body.email;
           sanitizedUser.save();
           res.render("login", { user: "set success" });
         });
