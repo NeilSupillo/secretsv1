@@ -4,8 +4,12 @@ const User = require("../models/User");
 const router = express.Router();
 let wrong = "";
 let user = "";
+let register = "";
+let login = "";
+
 router.get("/register", function (req, res) {
-  res.render("register", { user: "" });
+  res.render("register", { user: register });
+  register = "";
 });
 
 router.post("/register", function (req, res) {
@@ -14,7 +18,8 @@ router.post("/register", function (req, res) {
     req.body.password,
     function (err, user) {
       if (err) {
-        res.render("register", { user: "registered" });
+        res.redirect("/register");
+        register = "registered";
       } else {
         passport.authenticate("local")(req, res, function () {
           res.redirect("/secrets");
@@ -25,8 +30,8 @@ router.post("/register", function (req, res) {
 });
 
 router.get("/login", function (req, res) {
-  res.render("login", { user: user });
-  user = "";
+  res.render("login", { user: login });
+  login = "";
 });
 
 router.post("/login", function (req, res, next) {
@@ -37,9 +42,11 @@ router.post("/login", function (req, res, next) {
     if (!user) {
       const email = await User.findOne({ username: req.body.username }).lean();
       if (!email) {
-        return res.render("login", { user: "email" });
+        login = "email";
+        return res.redirect("/login");
       } else {
-        return res.render("login", { user: "wrong" });
+        login = "wrong";
+        return res.redirect("/login");
       }
     }
     req.logIn(user, function (err) {
@@ -79,7 +86,8 @@ router.post("/changePassword", function (req, res) {
       res.redirect("/account");
       //res.render("account", { user: req.user });
     } else {
-      res.render("login", { user: "change pass" });
+      login = "change pass";
+      res.redirect("/login");
     }
   });
 });
@@ -90,7 +98,8 @@ router.post("/forget", async function (req, res) {
       if (sanitizedUser) {
         sanitizedUser.setPassword(req.body.password, function () {
           sanitizedUser.save();
-          res.render("login", { user: "forget success" });
+          login = "forget success";
+          res.redirect("/login");
         });
       } else {
         res.render("forget", { user: "not found" });
@@ -109,7 +118,8 @@ router.post("/setPassword", async function (req, res) {
         sanitizedUser.setPassword(req.body.password, function () {
           sanitizedUser.username = req.body.email;
           sanitizedUser.save();
-          res.render("login", { user: "set success" });
+          res.redirect("/login");
+          login = "set success";
         });
       } else {
         res.status(500).json({ message: "Something goes wrong" });
