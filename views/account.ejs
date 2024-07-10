@@ -9,7 +9,7 @@
     <div class="nav-con">
       <ul class="navbar-nav mb-2 mr-2">
         <li class="nav-item">
-          <a class="account" href="/submit">Account</a>
+          <a class="account" href="/account">Account</a>
         </li>
       </ul>
     </div>
@@ -24,28 +24,46 @@
         <div class="card-body">
           <h3 class="title-account">Account</h3>
           <!-- delete account -->
-          <form action="/deleteAccount" method="POST">
+          <form id="delete-account-form" action="/deleteAccount" method="POST">
             <div class="form-group">
               <label for="text">Email</label>
+              <% if (user.email) { %>
               <input
                 type="text"
                 class="form-control"
                 name="current"
-                value="<%=user.username%>"
+                value="<%= user.email %>"
                 disabled
               />
+              <% } else { %>
+              <input
+                type="text"
+                class="form-control"
+                name="current"
+                value="<%= user.username %>"
+                disabled
+              />
+              <% } %>
             </div>
-            <button type="submit" class="btn btn-dark">Delete Account</button>
+            <button type="button" class="btn btn-dark" id="delete-account-btn">
+              Delete Account
+            </button>
           </form>
           <hr />
+          <div id="customModal" class="custom-modal">
+            <div class="custom-modal-dialog">
+              <h5>Are you sure you want to delete your account?</h5>
+              <button type="button" class="btn btn-danger" id="confirmDelete">
+                Yes, Delete
+              </button>
+              <button type="button" class="btn btn-secondary" id="cancelDelete">
+                Cancel
+              </button>
+            </div>
+          </div>
           <div class="logout-back">
             <a class="btn btn-light btn-lg logout" href="/logout" role="button"
               >Log Out</a
-            >
-          </div>
-          <div class="logout-back">
-            <a class="btn btn-light btn-lg logout" href="/secrets" role="button"
-              >Secrets</a
             >
           </div>
         </div>
@@ -179,6 +197,36 @@
   </div>
 </div>
 <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const deleteButton = document.getElementById("delete-account-btn");
+    const confirmButton = document.getElementById("confirmDelete");
+    const cancelButton = document.getElementById("cancelDelete");
+    const customModal = document.getElementById("customModal");
+    const form = document.getElementById("delete-account-form"); // Define form here
+
+    // Show the custom modal when the delete button is clicked
+    deleteButton.addEventListener("click", function () {
+      customModal.style.display = "block";
+    });
+
+    // Hide the custom modal and submit the form if the user confirms
+    confirmButton.addEventListener("click", function () {
+      form.submit(); // Submit the form
+    });
+
+    // Hide the custom modal if the user cancels
+    cancelButton.addEventListener("click", function () {
+      customModal.style.display = "none";
+    });
+
+    // Hide the custom modal if the user clicks outside of it
+    window.addEventListener("click", function (event) {
+      if (event.target === customModal) {
+        customModal.style.display = "none";
+      }
+    });
+  });
+
   function handler(id) {
     document.getElementById("p" + id).setAttribute("hidden", true);
     document.getElementById("input" + id).removeAttribute("hidden");

@@ -130,14 +130,6 @@ app.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
-// app.get(
-//   "/auth/google/secrets",
-//   passport.authenticate("google", { failureRedirect: "/duplicate" }),
-//   function (req, res) {
-//     // Successful authentication, redirect to secrets.
-//     res.redirect("/secrets");
-//   }
-// );
 
 app.get(
   "/auth/google/secrets",
@@ -185,14 +177,7 @@ app.get("/secrets", async function (req, res) {
     res.redirect("/login");
   }
 });
-/* app.get("/secrets", function(req, res){
-  if (req.isAuthenticated()){
-    res.render("secrets");
-  } else {
-    res.redirect("/login");
-  }
-});  */
-//see account
+
 app.get("/account", async function (req, res) {
   //console.log("submit user " + req.user.hash);
   //console.log(req);
@@ -222,7 +207,7 @@ app.post("/submit", async function (req, res) {
   const cus = {
     secret: submittedSecret,
   };
-  //Once the user is authenticated and their session gets saved, their user details are saved to req.user.
+
   // console.log(req.user.id);
   const foundUser = await User.findById(req.user.id);
   if (foundUser) {
@@ -230,6 +215,7 @@ app.post("/submit", async function (req, res) {
     foundUser.save();
     res.redirect("/secrets");
   } else {
+    res.redirect("/login");
     console.log(err);
   }
 });
@@ -283,21 +269,6 @@ app.post("/changePassword", function (req, res) {
 });
 // forget password
 app.post("/forget", async function (req, res) {
-  //console.log("change password" + req.body);
-  // console.log("change password user" + req.user);
-  // const email = await User.findOne({ username: req.body.username });
-  // if (email) {
-  //   email.setPassword(req.body.password, function (err, user) {
-  //     if (err) {
-  //       console.log(err);
-  //     } else {
-  //       console.log(user);
-  //       // res.redirect("/login");
-  //     }
-  //   });
-  // } else {
-  //   res.render("forget", { user: "not found" });
-  // }
   User.findOne({ username: req.body.username }).then(
     function (sanitizedUser) {
       if (sanitizedUser) {
@@ -349,7 +320,7 @@ app.post("/delete", function (req, res) {
 });
 //delete account
 app.post("/deleteAccount", async function (req, res) {
-  //console.log("delete user info " + req.user);
+  console.log("delete user info " + req.user);
   try {
     await User.findByIdAndDelete(req.user._id);
     res.redirect("/register");
@@ -357,34 +328,7 @@ app.post("/deleteAccount", async function (req, res) {
     console.log(error.message);
   }
 });
-app.listen(3000, function () {
-  console.log("Server started on port 3000.");
-});
-app.post("/loin", function (req, res) {
-  const user = new User({
-    username: req.body.username,
-    password: req.body.password,
-  });
 
-  req.login(user, function (err) {
-    if (err) {
-      res.redirect("/register");
-    } else {
-      passport.authenticate("local")(req, res, function () {
-        console.log("tanga");
-        res.redirect("/secrets");
-      });
-    }
-  });
-});
-
-app.post(
-  "/logi",
-  passport.authenticate("local", {
-    successRedirect: "/secrets",
-    failureRedirect: "/login",
-  })
-);
 app.post("/login", function (req, res, next) {
   passport.authenticate("local", async function (err, user, info) {
     //console.log("all" + err, user, info);
@@ -409,4 +353,8 @@ app.post("/login", function (req, res, next) {
       return res.redirect("/secrets");
     });
   })(req, res, next);
+});
+
+app.listen(3000, function () {
+  console.log("Server started on port 3000.");
 });
