@@ -9,6 +9,7 @@ const passport = require("passport");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const secretRoutes = require("./routes/secretRoutes");
+const User = require("./models/User");
 
 require("./config/passport-setup");
 
@@ -44,12 +45,11 @@ app.use(authRoutes);
 app.use(userRoutes);
 app.use(secretRoutes);
 
-app.get("/", function (req, res) {
-  res.render("home");
-});
-
-app.get("/duplicate", function (req, res) {
-  res.render("duplicate");
+app.get("/", async function (req, res) {
+  const foundUsers = await User.find({
+    secrets: { $exists: true, $not: { $size: 0 } },
+  });
+  res.render("home", { usersWithSecrets: foundUsers });
 });
 
 app.get("/forget", function (req, res) {

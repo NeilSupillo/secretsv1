@@ -142,9 +142,7 @@ app.get(
 app.get("/", function (req, res) {
   res.render("home");
 });
-app.get("/duplicate", function (req, res) {
-  res.render("duplicate");
-});
+
 app.get("/login", function (req, res) {
   //console.log(req);
   //console.log("find" + req.user);
